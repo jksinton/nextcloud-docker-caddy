@@ -4,7 +4,7 @@ This is a guide for deploying [Nextcloud](https://github.com/nextcloud/docker) b
 
 # Domain
 
-This guide assumes you already have setup a domain name for your server. Consider seeing ``tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1) for domain service.
+This guide assumes you already have setup a domain name for your server. Consider seeing ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1) for domain service.
 
 # Docker Compose Project Structure
 
