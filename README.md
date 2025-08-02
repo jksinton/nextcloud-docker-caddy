@@ -1,6 +1,8 @@
 # Introduction
 
-This is a guide for deploying [Nextcloud](https://github.com/nextcloud/docker) behind a [Caddy](https://hub.docker.com/_/caddy) reverse proxy using docker compose, where the Nextcloud app serves a subdomain ```cloud.exmaple.com```. It is derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s guide in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy), primarily in the interest of using the official image to avoid any dependency issues in the future.
+This is an example of the [Nextcloud](https://github.com/nextcloud/docker) docker image behind a [Caddy](https://hub.docker.com/_/caddy) reverse proxy. In this example, the Nextcloud app serves a subdomain ```cloud.exmaple.com```. 
+
+First off, thank you, [```tmo1```](https://gist.github.com/tmo1). This guide is derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s guide in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy), primarily in the interest of using the official image to avoid any dependency issues in the future.
 
 # Docker Compose Project Structure
 
