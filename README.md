@@ -62,7 +62,7 @@ docker network create \
 
 # Nextcloud
 
-Create the docker compose file (```compose.yaml```) for Nextcloud in the ```nextcloud``` project directory:
+Create the docker compose file (```compose.yaml```) for Nextcloud in the ```nextcloud``` project folder:
 
 ```yaml
 # See https://github.com/nextcloud/docker/?tab=readme-ov-file#running-this-image-with-docker-compose
@@ -144,17 +144,17 @@ Update the permissions of ```.env```:
 ```bash
 chmod 600 .env
 ```
-Start Nextcloud by running this in the ```nextcloud``` project directory:
+Start Nextcloud by running this in the ```nextcloud``` project folder:
 ```bash
 docker compose up -d
 ```
 
 For debugging, consider running the container in the foreground:
 ```bash
-docker compose up -d
+docker compose up
 ```
 
-If you have access to the host of the Nextcloud app, consider uncommenting the ports section. You can bring up the Nextcloud app, and configure the installation at [localhost:8080](http://localhost:8080/) before exposing the image to the world wide web.
+If you have access to the host of the Nextcloud app, consider uncommenting the ports section. You can bring up the Nextcloud app, and configure the installation at [localhost:8080](http://localhost:8080/) before exposing the image to the world wide web.  You can also do this step just to verify that you can see the initial install screen.
 
 # Caddy
 
@@ -184,12 +184,12 @@ networks:
 ```
 Note this includes the second docker network ```caddy``` to connect to an Nginx app for the web root. You can remove this network, if you aren't using a similar configuration.
 
-Create the ```Dockerfile``` in the ```caddy-build``` directory:
+Create the ```Dockerfile``` in the ```caddy-build``` folder:
 ```bash
 FROM caddy:latest
 COPY Caddyfile /etc/caddy/Caddyfile
 ```
-Create the ```Caddyfile``` in the ```caddy-build``` directory:
+Create the ```Caddyfile``` in the ```caddy-build``` folder:
 ```json
 {
     email {$ACME_EMAIL}
@@ -205,10 +205,58 @@ cloud.example.com {
     reverse_proxy nc-app:80
 }
 ```
-Create the ```.env``` file in the ```caddy-env``` directory:
+Create the ```.env``` file in the ```caddy-env``` folder:
 ```bash
 ACME_EMAIL="email@example.com"
 ACME_AGREE=true
 TZ='America/Chicago'
 ```
 Update your email and timezone to the appropriate values.
+
+Start Caddy by running this in the ```caddy``` project folder:
+```bash
+docker compose up -d
+```
+
+For debugging, consider running the container in the foreground:
+```bash
+docker compose up
+```
+
+# Hosting Web Root
+
+If you want to host the web root of your domain, for example, a linktree using Nginx, create another docker compose project:
+
+```
+www
+├── build-nginx
+│   ├── Dockerfile
+│   └── html
+│       └── index.html
+└── compose.yaml
+```
+Create the docker compose file (```compose.yaml```) for Nginx in your ```www``` project folder:
+```yaml
+services:
+  nginx-app:
+    build: ./build-nginx/.
+    restart: always
+    # ports:
+    #  - 8080:80
+    networks:
+      - caddy
+
+networks:
+  caddy:
+    external: true
+```
+Create the ```Dockerfile``` in the ```build-nginx``` folder:
+```bash
+FROM nginx
+COPY --chown=101:101 ./html /usr/share/nginx/html
+```
+
+Start Nginx by running this in the ```www``` project folder:
+```bash
+docker compose up -d
+```
