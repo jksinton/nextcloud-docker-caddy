@@ -255,6 +255,7 @@ Create the ```Dockerfile``` in the ```build-nginx``` folder:
 FROM nginx
 COPY --chown=101:101 ./html /usr/share/nginx/html
 ```
+Put your static HTML web page in the ```html``` folder in the ```build-nginx``` folder.
 
 Start Nginx by running this in the ```www``` project folder:
 ```bash
