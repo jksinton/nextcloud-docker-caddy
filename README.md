@@ -1,6 +1,6 @@
 # Introduction
 
-This is a guide for deploying [Nextcloud](https://github.com/nextcloud/docker) behind a [Caddy](https://hub.docker.com/_/caddy) reverse proxy using docker compose. It is derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s guide in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy), primarily in the interest of using the official image to avoid any dependency issues in the future. It also uses a separate project for Caddy to allow for separate ma
+This is a guide for deploying [Nextcloud](https://github.com/nextcloud/docker) behind a [Caddy](https://hub.docker.com/_/caddy) reverse proxy using docker compose. It is derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s guide in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy), primarily in the interest of using the official image to avoid any dependency issues in the future.
 
 # Docker Compose Project Structure
 
@@ -25,7 +25,7 @@ stacks
 
 # Domain Name
 
-This guide assumes you already have setup a domain name for your server. Consider seeing ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1) for setuping a domain name.
+This guide assumes you already have setup a domain name for your server. Consider seeing ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1#domain-name) for one solution.
 
 # Install Docker
 
@@ -60,7 +60,7 @@ docker network create \
 
 # Nextcloud
 
-Create the Nextcloud docker compose file:
+Create the Nextcloud docker compose file (```compose.yaml```) in the ```nextcloud``` project folder:
 
 ```bash
 # See https://github.com/nextcloud/docker/?tab=readme-ov-file#running-this-image-with-docker-compose
@@ -132,3 +132,12 @@ networks:
   nc-proxy:
     external: true
 ```
+
+Set the mysql passwords in the ```.env``` file:
+```bash
+MYSQL_ROOT_PASSWORD=password1
+MYSQL_PASSWORD=password2
+```
+
+# Caddy
+
