@@ -60,7 +60,7 @@ docker network create \
 
 # Nextcloud
 
-Create the Nextcloud docker compose file (```compose.yaml```) in the ```nextcloud``` project folder:
+Create the docker compose file (```compose.yaml```) for Nextcloud in your ```nextcloud``` project folder:
 
 ```bash
 # See https://github.com/nextcloud/docker/?tab=readme-ov-file#running-this-image-with-docker-compose
@@ -91,9 +91,9 @@ services:
   
   # Nextcloud apache container config:
   nc-app:
-    # Select the Nextcloud version appropriate for your system
+    # Select the Nextcloud image version appropriate for your system
     # I used 30.0.13 due to a migration from bare metal to a docker container
-    # So I needed both systems on the same version
+    # Thus, I needed both systems (old-bare metal and new-docker) to be on the same version.
     image: nextcloud:30.0.13-apache
     restart: always
     # Enable ports for testing
@@ -138,6 +138,60 @@ Set the mysql passwords in the ```.env``` file:
 MYSQL_ROOT_PASSWORD=password1
 MYSQL_PASSWORD=password2
 ```
+Update the permissions of ```.env```:
+```bash
+chmod 600 .env
+```
 
 # Caddy
 
+Create the docker compose file (```compose.yaml```) for Caddy in your ```caddy``` project folder:
+```bash
+services:
+  caddy:
+    build: ./caddy-build/.
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file:
+      - ./caddy-env/.env
+    volumes:
+      - ./caddy-build/Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      nc-proxy:
+        ipv4_address: 172.16.0.2
+
+networks:
+  nc-proxy:
+    external: true
+```
+If you opt to use a second network, here is the compose file to connect to other services without using the static ips:
+```yaml
+services:
+  caddy:
+    build: ./caddy-build/.
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file:
+      - ./caddy-env/.env
+    volumes:
+      - ./caddy-build/Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      nc-proxy:
+        ipv4_address: 172.16.0.2
+      caddy:
+
+networks:
+  nc-proxy:
+    external: true
+  caddy:
+    external: true
+```
+Create the ```Dockerfile``` in the ```caddy-build``` directory:
+```bash
+FROM caddy:latest
+COPY Caddyfile /etc/caddy/Caddyfile
+```
