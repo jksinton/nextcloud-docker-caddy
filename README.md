@@ -31,7 +31,11 @@ stacks
 
 Configure at least one docker network outside of your compose files. This will be used to connect Caddy and the Nextcloud docker app. In your compose files, you will flag these networks as being ```external```, which tells docker compose not to manage the networks.
 
-```mk-networks.sh```:
+Run ```mk-networks.sh```:
+```bash
+# ./mk-networks.sh
+```
+or 
 ```bash
 docker network create \
         --driver=bridge \
