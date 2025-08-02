@@ -190,7 +190,7 @@ FROM caddy:latest
 COPY Caddyfile /etc/caddy/Caddyfile
 ```
 Create the ```Caddyfile``` in the ```caddy-build``` folder:
-```json
+```
 {
     email {$ACME_EMAIL}
 }
