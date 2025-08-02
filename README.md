@@ -1,6 +1,6 @@
 # Introduction
 
-This is a guide for deploying [Nextcloud](https://github.com/nextcloud/docker) behind a [Caddy](https://hub.docker.com/_/caddy) reverse proxy using docker compose. It is derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s guide in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy), primarily in the interest of using the official image to avoid any dependency issues in the future.
+This is a guide for deploying [Nextcloud](https://github.com/nextcloud/docker) behind a [Caddy](https://hub.docker.com/_/caddy) reverse proxy using docker compose, where the Nextcloud app serves a subdomain ```cloud.exmaple.com```. It is derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s guide in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy), primarily in the interest of using the official image to avoid any dependency issues in the future.
 
 # Docker Compose Project Structure
 
@@ -25,13 +25,15 @@ stacks
 
 # Domain Name
 
-This guide assumes you already have setup a domain name for your server. Consider seeing ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1#domain-name) for one solution.
+This guide assumes you already have setup a domain name for your server. Consider seeing ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1#domain-name) for one solution. In addition, a subdomain (for example, ```cloud.example.com```) is setup for your Nextcloud app.
 
 # Install Docker
 
 This guide assumes you have installed docker and docker-compose for your system. Consider following [this](https://wiki.archlinux.org/title/Docker) guide for Arch-based systems.
 
 Consider that by default docker images are located in ```/var/lib/docker/```. You may consider moving the data root directory for docker if ```/var/lib/docker/``` doesn't have enough space for your Nextcloud data. You can configure the data root directory in ```/etc/docker/daemon.json```. See [this](https://wiki.archlinux.org/title/Docker#Images_location) for more information. For a fresh installation of docker, you may need to create the ```/etc/docker``` directory and ```/etc/docker/daemon.json``` file.
+
+This guide also assumes the user running the command is part of the ```docker``` user group or is being run by root (for example, via ```sudo```).
 
 # Create a Docker Network
 
@@ -49,7 +51,7 @@ docker network create \
         --gateway=172.16.0.1 \
         nc-proxy
 ```
-Consider also creating a second network to allow other apps to connect to Caddy. For example, I'm also running Nginx to host my web root: ```example.com```. Since Nginx doesn't need a static ip for the reverse proxy like Nextcloud, I opted to create a second network to benefit from docker's internal networking.
+Consider creating a second network to allow other apps to connect to Caddy. For example, I'm also running Nginx to host my web root: ```example.com```. Since Nginx doesn't need a static ip for the reverse proxy like Nextcloud, I opted to create a second network to benefit from docker's internal networking.
 
 For example, you can create the ```caddy``` network by running:
 ```bash
@@ -60,9 +62,9 @@ docker network create \
 
 # Nextcloud
 
-Create the docker compose file (```compose.yaml```) for Nextcloud in your ```nextcloud``` project folder:
+Create the docker compose file (```compose.yaml```) for Nextcloud in the ```nextcloud``` project directory:
 
-```bash
+```yaml
 # See https://github.com/nextcloud/docker/?tab=readme-ov-file#running-this-image-with-docker-compose
 
 services:
@@ -142,31 +144,21 @@ Update the permissions of ```.env```:
 ```bash
 chmod 600 .env
 ```
+Start Nextcloud by running this in the ```nextcloud``` project directory:
+```bash
+docker compose up -d
+```
+
+For debugging, consider running the container in the foreground:
+```bash
+docker compose up -d
+```
+
+If you have access to the host of the Nextcloud app, consider uncommenting the ports section. You can bring up the Nextcloud app, and configure the installation at [localhost:8080](http://localhost:8080/) before exposing the image to the world wide web.
 
 # Caddy
 
 Create the docker compose file (```compose.yaml```) for Caddy in your ```caddy``` project folder:
-```bash
-services:
-  caddy:
-    build: ./caddy-build/.
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    env_file:
-      - ./caddy-env/.env
-    volumes:
-      - ./caddy-build/Caddyfile:/etc/caddy/Caddyfile
-    networks:
-      nc-proxy:
-        ipv4_address: 172.16.0.2
-
-networks:
-  nc-proxy:
-    external: true
-```
-If you opt to use a second network, here is the compose file to connect to other services without using the static ips:
 ```yaml
 services:
   caddy:
@@ -190,8 +182,33 @@ networks:
   caddy:
     external: true
 ```
+Note this includes the second docker network ```caddy``` to connect to an Nginx app for the web root. You can remove this network, if you aren't using a similar configuration.
+
 Create the ```Dockerfile``` in the ```caddy-build``` directory:
 ```bash
 FROM caddy:latest
 COPY Caddyfile /etc/caddy/Caddyfile
 ```
+Create the ```Caddyfile``` in the ```caddy-build``` directory:
+```json
+{
+    email {$ACME_EMAIL}
+}
+
+# nginx web-root
+example.com {
+    reverse_proxy nginx-app:80
+}
+
+# Nextcloud
+cloud.example.com {
+    reverse_proxy nc-app:80
+}
+```
+Create the ```.env``` file in the ```caddy-env``` directory:
+```bash
+ACME_EMAIL="email@example.com"
+ACME_AGREE=true
+TZ='America/Chicago'
+```
+Update your email and timezone to the appropriate values.
