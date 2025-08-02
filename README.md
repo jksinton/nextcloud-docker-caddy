@@ -225,7 +225,7 @@ docker compose up
 
 # Hosting Web Root
 
-If you want to host the web root of your domain, for example, a linktree using Nginx, create another docker compose project:
+If you want to host the web root of your domain, for example, [a linktree](https://github.com/vitor-antoni/linktree-template) using Nginx, create another docker compose project:
 
 ```
 www
