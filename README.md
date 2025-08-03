@@ -1,12 +1,12 @@
 # Introduction
 
-This is an example of the [Nextcloud](https://github.com/nextcloud/docker) docker image behind a [Caddy](https://hub.docker.com/_/caddy) reverse proxy. In this example, the Nextcloud app serves a subdomain ```cloud.exmaple.com```. 
+This is an example of [Nextcloud](https://github.com/nextcloud/docker) docker image served behind a [Caddy](https://hub.docker.com/_/caddy) reverse proxy. In this example, the Nextcloud app serves a subdomain ```cloud.exmaple.com``` of the web root domain ```example.com```. 
 
-First off, thank you, [```tmo1```](https://gist.github.com/tmo1). This guide is derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s guide in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy), primarily in the interest of using the official image to avoid any dependency issues in the future.
+First off, thank you, [```tmo1```](https://gist.github.com/tmo1). This deployment is derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s configuration in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy), primarily in the interest avoiding any dependency issues with Caddy wrapper, [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy).
 
 # Docker Compose Project Structure
 
-The docker compose projects will have this structure:
+This deploment uses the following project structure:
 
 ```md
 stacks
@@ -24,6 +24,7 @@ stacks
     └── compose.yaml
     └── .env
 ```
+where ```stacks``` represents the root of you docker stack projects. You can consider working on it in ```$HOME``` or alternatively, ```/opt```. 
 
 # Domain Name
 
@@ -31,15 +32,17 @@ This guide assumes you already have setup a domain name for your server. Conside
 
 # Install Docker
 
-This guide assumes you have installed docker and docker-compose for your system. Consider following [this](https://wiki.archlinux.org/title/Docker) guide for Arch-based systems.
+This guide assumes you have installed docker and docker-compose on your system. Consider using [this](https://wiki.archlinux.org/title/Docker) wiki article on how to install and intially ocnfigure docker for Arch-based systems.
 
+## Docker's Data Root
 Consider that by default docker images are located in ```/var/lib/docker/```. You may consider moving the data root directory for docker if ```/var/lib/docker/``` doesn't have enough space for your Nextcloud data. You can configure the data root directory in ```/etc/docker/daemon.json```. See [this](https://wiki.archlinux.org/title/Docker#Images_location) for more information. For a fresh installation of docker, you may need to create the ```/etc/docker``` directory and ```/etc/docker/daemon.json``` file.
 
+## Docker user group
 This guide also assumes the user running the command is part of the ```docker``` user group or is being run by root (for example, via ```sudo```).
 
 # Create a Docker Network
 
-Create a docker network outside of your compose files. This will be used to connect Caddy and the Nextcloud docker app. In your compose files, you will flag these networks as being ```external```, which tells docker compose not to manage the networks.
+Create a docker network outside of your compose files. This will be used to connect Caddy to the Nextcloud docker app. In your compose files, you will flag the docker networks as being ```external```, which tells docker compose to NOT manage the networks [See, for example](https://docs.docker.com/compose/how-tos/networking/#use-an-existing-network).
 
 Run ```mk-networks.sh```:
 ```bash
@@ -53,7 +56,7 @@ docker network create \
         --gateway=172.16.0.1 \
         nc-proxy
 ```
-Consider creating a second network to allow other apps to connect to Caddy. For example, I'm also running Nginx to host my web root: ```example.com```. Since Nginx doesn't need a static ip for the reverse proxy like Nextcloud, I opted to create a second network to benefit from docker's internal networking.
+Consider creating a second network to allow other apps to connect to Caddy. For example, I'm also running an Nginx docker image to host the web root: ```example.com```. Since Nginx doesn't need a static ip for the reverse proxy like Nextcloud, you can create a second network to benefit from docker's internal [networking](https://docs.docker.com/reference/compose-file/networks/).
 
 For example, you can create the ```caddy``` network by running:
 ```bash
@@ -158,6 +161,10 @@ docker compose up
 
 If you have access to the host of the Nextcloud app, consider uncommenting the ports section. You can bring up the Nextcloud app, and configure the installation at [localhost:8080](http://localhost:8080/) before exposing the image to the world wide web.  You can also do this step just to verify that you can see the initial install screen.
 
+## Run cron.sh
+
+TODO: configure cron
+
 # Caddy
 
 Create the docker compose file (```compose.yaml```) for Caddy in your ```caddy``` project folder:
@@ -210,10 +217,9 @@ cloud.example.com {
 Create the ```.env``` file in the ```caddy-env``` folder:
 ```bash
 ACME_EMAIL="email@example.com"
-ACME_AGREE=true
 TZ='America/Chicago'
 ```
-Update your email and timezone to the appropriate values.
+ACM EMAIL is the email you are willing to provide 
 
 Start Caddy by running this in the ```caddy``` project folder:
 ```bash
@@ -237,6 +243,8 @@ www
 │       └── index.html
 └── compose.yaml
 ```
+```www``` can be inside the stacks docker projects folder.
+
 Create the docker compose file (```compose.yaml```) for Nginx in your ```www``` project folder:
 ```yaml
 services:
@@ -257,7 +265,9 @@ Create the ```Dockerfile``` in the ```build-nginx``` folder:
 FROM nginx
 COPY --chown=101:101 ./html /usr/share/nginx/html
 ```
-Put your static HTML web page in the ```html``` folder in the ```build-nginx``` folder.
+You will need to copy the html data and update the ownership using [```chown```](https://hub.docker.com/_/nginx#user-and-group-id).
+
+Put your static HTML (for example, ```index.html```) in the ```html``` folder, which is in the ```build-nginx``` folder. For example, you can make the root [a linktree](https://github.com/vitor-antoni/linktree-template). As an alternative, you can make this a wordpress app or the like. 
 
 Start Nginx by running this in the ```www``` project folder:
 ```bash
