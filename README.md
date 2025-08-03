@@ -219,7 +219,7 @@ Create the ```.env``` file in the ```caddy-env``` folder:
 ACME_EMAIL="email@example.com"
 TZ='America/Chicago'
 ```
-ACM EMAIL is the email you are willing to provide 
+TODO update this.
 
 Start Caddy by running this in the ```caddy``` project folder:
 ```bash
