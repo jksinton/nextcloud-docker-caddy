@@ -1,0 +1,13 @@
+{
+    email {$ACME_EMAIL}
+}
+
+# nginx web-root
+example.com {
+    reverse_proxy nginx-app:80
+}
+
+# Nextcloud
+cloud.example.com {
+    reverse_proxy nc-app:80
+}

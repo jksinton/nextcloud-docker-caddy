@@ -1,0 +1,21 @@
+services:
+  caddy:
+    build: ./caddy-build/.
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file:
+      - ./caddy-env/.env
+    volumes:
+      - ./caddy-build/Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      nc-proxy:
+        ipv4_address: 172.16.0.2
+      caddy:
+
+networks:
+  nc-proxy:
+    external: true
+  caddy:
+    external: true
