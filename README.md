@@ -1,8 +1,8 @@
 # Introduction
 
-This is an example of [Nextcloud](https://github.com/nextcloud/docker) docker image served behind a [Caddy](https://hub.docker.com/_/caddy) reverse proxy. In this example, the Nextcloud app serves a subdomain ```cloud.exmaple.com``` of the web root domain ```example.com```. 
+This is an example of [Nextcloud](https://github.com/nextcloud/docker) docker image served behind a reverse proxying, using a [Caddy](https://hub.docker.com/_/caddy) docker image. In this example, the Nextcloud app serves a subdomain ```cloud.exmaple.com``` of the web root domain ```example.com```. Allowing you to easily spin-up other docker containers under your domain's web root and other subdomains.
 
-First off, thank you, [```tmo1```](https://gist.github.com/tmo1). This deployment is derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s configuration in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy), primarily in the interest avoiding any dependency issues with Caddy wrapper, [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy).
+First off, thank you, [```tmo1```](https://gist.github.com/tmo1). This deployment is primarily derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s configuration in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy).
 
 # Docker Compose Project Structure
 
@@ -24,7 +24,7 @@ stacks
     └── compose.yaml
     └── .env
 ```
-where ```stacks``` represents the root of you docker stack projects. You can consider working on it in ```$HOME``` or alternatively, ```/opt```. 
+where ```stacks``` represents the root of your docker stack projects. You can consider working on this deployment under ```stack``` in ```$HOME``` or alternatively, ```/opt```. 
 
 # Domain Name
 
