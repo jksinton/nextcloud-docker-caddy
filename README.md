@@ -24,7 +24,7 @@ stacks
     └── compose.yaml
     └── .env
 ```
-where ```stacks``` represents the root of your docker stack projects. You can consider working on this deployment under ```stack``` in ```$HOME``` or alternatively, ```/opt```. 
+where ```stacks``` represents the root of your docker stack projects. You can consider working on this deployment under ```stacks``` in ```$HOME``` or alternatively, ```/opt```. 
 
 # Domain Name
 
