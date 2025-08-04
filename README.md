@@ -1,6 +1,6 @@
 # Introduction
 
-This is an example of [Nextcloud](https://github.com/nextcloud/docker) docker image served behind a reverse proxying, using a [Caddy](https://hub.docker.com/_/caddy) docker image. In this example, the Nextcloud app serves a subdomain ```cloud.exmaple.com``` of the web root domain ```example.com```. Allowing you to easily spin-up other docker containers under your domain's web root and other subdomains.
+This is an example of a [Nextcloud](https://github.com/nextcloud/docker) docker image served behind a reverse proxying, using a [Caddy](https://hub.docker.com/_/caddy) docker image. In this example, the Nextcloud app serves a subdomain ```cloud.exmaple.com``` of the web root domain ```example.com```. Allowing you to easily spin-up other docker containers under your domain's web root and other subdomains.
 
 First off, thank you, [```tmo1```](https://gist.github.com/tmo1). This deployment is primarily derived from ```tmo1```'s guide [here](https://gist.github.com/tmo1/72a9dc98b0b6b75f7e4ec336cdc399e1). It in part diverges from ```tmo1```'s configuration in that this deployment uses the official image of [Caddy](https://hub.docker.com/_/caddy) rather than [caddy-docker-proxy](https://github.com/lucaslorentz/caddy-docker-proxy).
 
@@ -161,9 +161,9 @@ docker compose up
 
 If you have access to the host of the Nextcloud app, consider uncommenting the ports section. You can bring up the Nextcloud app, and configure the installation at [localhost:8080](http://localhost:8080/) before exposing the image to the world wide web.  You can also do this step just to verify that you can see the initial install screen.
 
-## Run cron.sh
+## Congigure Nextcloud's cron
 
-TODO: configure cron
+Configure cron. See https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html
 
 # Caddy
 
@@ -219,7 +219,7 @@ Create the ```.env``` file in the ```caddy-env``` folder:
 ACME_EMAIL="email@example.com"
 TZ='America/Chicago'
 ```
-TODO update this.
+TODO: Confirm whether these environment variables are still necessary.
 
 Start Caddy by running this in the ```caddy``` project folder:
 ```bash
