@@ -163,7 +163,30 @@ If you have access to the host of the Nextcloud app, consider uncommenting the p
 
 ## Congigure Nextcloud's cron
 
-Configure cron. See https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html
+There are two options for configuring the Nextcloud's cron:
+Add a ```cron``` service to the ```Nextcloud``` compose file, for example:
+```yaml
+  cron:
+    image: nextcloud:apache
+    restart: always
+    volumes:
+      - nextcloud:/var/www/html:z
+      # NOTE: The `volumes` config of the `cron` and `app` containers must match
+    entrypoint: /cron.sh
+    depends_on:
+      - db
+      - redis
+```
+Alternatively, run a cron on the host via ```docker container exec```:
+```bash
+docker container exec --user www-data nextcloud_container_name php /var/www/html/cron.php
+```
+where crontab entry is:
+```bash
+*/5  *  *  *  * docker container exec --user www-data nextcloud_container_name php /var/www/html/cron.php
+```
+
+See https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html
 
 # Caddy
 
