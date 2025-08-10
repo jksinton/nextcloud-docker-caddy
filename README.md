@@ -161,9 +161,9 @@ docker compose up
 
 If you have access to the host of the Nextcloud app, consider uncommenting the ports section. You can bring up the Nextcloud app, and configure the installation at [localhost:8080](http://localhost:8080/) before exposing the image to the world wide web.  You can also do this step just to verify that you can see the initial install screen.
 
-## Congigure Nextcloud's cron
+## Congigure Nextcloud's backgroud operations (i.e. the cron config)
 
-There are two options for configuring the Nextcloud's cron:
+There are two options for configuring Nextcloud's cron:
 Add a ```cron``` service to the ```Nextcloud``` compose file, for example:
 ```yaml
   cron:
@@ -177,16 +177,30 @@ Add a ```cron``` service to the ```Nextcloud``` compose file, for example:
       - db
       - redis
 ```
-Alternatively, run a cron on the host via ```docker container exec```:
+Alternatively, run a cron on the host machine via ```docker container exec```:
 ```bash
 docker container exec --user www-data nextcloud_container_name php /var/www/html/cron.php
 ```
-where crontab entry is:
+For ```crontab```, an example entry can look like:
 ```bash
 */5  *  *  *  * docker container exec --user www-data nextcloud_container_name php /var/www/html/cron.php
 ```
 
-See https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html
+For ```systemd```-based systems, ```/etc/systemd/system/nextcloud.service``` can look like this:
+```
+[Unit]
+Description=Nextcloud cron.php job
+
+[Service]
+User=www-data
+ExecCondition=docker container exec --user www-data nextcloud_container_name php occ status -e
+ExecStart=docerk container exec --user www-data nextcloud_container_name php -f /var/www/nextcloud/cron.php
+KillMode=process
+```
+
+Then create the ```nextcloudcron.timer``` per the Admin Manual.
+
+See (Nextcloud's Admin Manual on configuring the background jobs)[https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html]
 
 # Caddy
 
